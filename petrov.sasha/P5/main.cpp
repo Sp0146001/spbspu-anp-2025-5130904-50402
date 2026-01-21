@@ -309,11 +309,13 @@ namespace petrov
       std::cout << "Фигура " << (i + 1) << ":\n";
       std::cout << "  Площадь: " << shapes[i]->getArea() << '\n';
       rectangle_t frame = shapes[i]->getFrameRect();
-      std::cout << "  Ограничивающий прямоугольник: центр(" << frame.pos.x << ", " << frame.pos.y << "), ширина: " << frame.width << ", высота: " << frame.height << '\n';
+      std::cout << "  Ограничивающий прямоугольник: центр(" << frame.pos.x << ", " << frame.pos.y
+								<< "), ширина: " << frame.width << ", высота: " << frame.height << '\n';
     }
     std::cout << "Общая площадь: " << totalArea(shapes, n) << '\n';
     rectangle_t overall = overallFrame(shapes, n);
-    std::cout << "Общий ограничивающий прямоугольник: центр(" << overall.pos.x << ", " << overall.pos.y << "), ширина: " << overall.width << ", высота: " << overall.height << '\n';
+    std::cout << "Общий ограничивающий прямоугольник: центр(" << overall.pos.x << ", "
+							<< overall.pos.y << "), ширина: " << overall.width << ", высота: " << overall.height << '\n';
     std::cout << '\n';
   }
 }
