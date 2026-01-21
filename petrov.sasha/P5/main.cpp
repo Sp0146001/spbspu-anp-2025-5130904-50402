@@ -24,6 +24,59 @@ namespace petrov
     virtual void move(double dx, double dy) = 0;
     virtual void scale(double k) = 0;
   };
+  class Rectangle : public Shape
+  {
+  public:
+    Rectangle(const point_t& center, double width, double height);
+    double getArea() const override;
+    rectangle_t getFrameRect() const override;
+    void move(const point_t& pos) override;
+    void move(double dx, double dy) override;
+    void scale(double k) override;
+
+  private:
+    point_t center_;
+    double width_;
+    double height_;
+  };
+
+  Rectangle::Rectangle(const point_t& center, double width, double height):
+    center_(center),
+    width_(width),
+    height_(height)
+  {
+    if (width_ <= 0.0 || height_ <= 0.0)
+    {
+      throw std::invalid_argument("Ошибка: ширина и высота должны быть положительными");
+    }
+  }
+  double Rectangle::getArea() const
+  {
+    return width_ * height_;
+  }
+  rectangle_t Rectangle::getFrameRect() const
+  {
+    return {width_, height_, center_};
+  }
+  void Rectangle::move(const point_t& pos)
+  {
+    center_ = pos;
+  }
+  void Rectangle::move(double dx, double dy)
+  {
+    center_.x += dx;
+    center_.y += dy;
+  }
+  void Rectangle::scale(double k)
+  {
+    if (k <= 0.0)
+    {
+      throw std::invalid_argument("Ошибка: коэффициент масштабирования должен быть положительным");
+    }
+    width_ *= k;
+    height_ *= k;
+  }
+
 }
 int main() {
   return 0;
