@@ -163,10 +163,10 @@ namespace petrov
 
   void ComplexQuad::computeCenter()
   {
-    double x1 = points_[0].x, double y1 = points_[0].y;
-    double x2 = points_[2].x, double y2 = points_[2].y;
-    double x3 = points_[1].x, double y3 = points_[1].y;
-    double x4 = points_[3].x, double y4 = points_[3].y;
+    double x1 = points_[0].x, y1 = points_[0].y;
+    double x2 = points_[2].x, y2 = points_[2].y;
+    double x3 = points_[1].x, y3 = points_[1].y;
+    double x4 = points_[3].x, y4 = points_[3].y;
 
     double denom = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
     if (std::abs(denom) < 1e-12)
