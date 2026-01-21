@@ -126,10 +126,6 @@ namespace petrov
 
   void Diamond::scale(double k)
   {
-    if (k <= 0.0)
-    {
-      throw std::invalid_argument("Ошибка: коэффициент масштабирования должен быть положительным");
-    }
     diag_h_ *= k;
     diag_v_ *= k;
   }
@@ -234,10 +230,6 @@ namespace petrov
 
   void ComplexQuad::scale(double k)
   {
-    if (k <= 0.0)
-    {
-      throw std::invalid_argument("Ошибка: коэффициент масштабирования должен быть положительным");
-    }
     for (int i = 0; i < 4; ++i)
     {
       points_[i].x = center_.x + (points_[i].x - center_.x) * k;
@@ -247,10 +239,6 @@ namespace petrov
 
   void scaleAll(Shape** shapes, size_t n, const point_t& center, double k)
   {
-    if (k <= 0.0)
-    {
-      throw std::invalid_argument("Ошибка: коэффициент масштабирования должен быть положительным");
-    }
     for (size_t i = 0; i < n; ++i)
     {
       shapes[i]->move(-center.x, -center.y);
@@ -309,13 +297,13 @@ namespace petrov
       std::cout << "Фигура " << (i + 1) << ":\n";
       std::cout << "  Площадь: " << shapes[i]->getArea() << '\n';
       rectangle_t frame = shapes[i]->getFrameRect();
-      std::cout << "  Ограничивающий прямоугольник: центр(" << frame.pos.x << ", " << frame.pos.y
-								<< "), ширина: " << frame.width << ", высота: " << frame.height << '\n';
+      std::cout << "  Ограничивающий прямоугольник: центр(" << frame.pos.x << ", " << frame.pos.y;
+			std::cout	<< "), ширина: " << frame.width << ", высота: " << frame.height << '\n';
     }
     std::cout << "Общая площадь: " << totalArea(shapes, n) << '\n';
     rectangle_t overall = overallFrame(shapes, n);
-    std::cout << "Общий ограничивающий прямоугольник: центр(" << overall.pos.x << ", "
-							<< overall.pos.y << "), ширина: " << overall.width << ", высота: " << overall.height << '\n';
+    std::cout << "Общий ограничивающий прямоугольник: центр(" << overall.pos.x << ", ";
+		std::cout	<< overall.pos.y << "), ширина: " << overall.width << ", высота: " << overall.height << '\n';
     std::cout << '\n';
   }
 }
