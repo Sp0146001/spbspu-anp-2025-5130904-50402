@@ -302,8 +302,8 @@ namespace petrov
     }
     std::cout << "Общая площадь: " << totalArea(shapes, n) << '\n';
     rectangle_t overall = overallFrame(shapes, n);
-    std::cout << "Общий ограничивающий прямоугольник: центр(" << overall.pos.x << ", ";
-		std::cout	<< overall.pos.y << "), ширина: " << overall.width << ", высота: " << overall.height << '\n';
+    std::cout << "Общий ограничивающий прямоугольник: центр(" << overall.pos.x << ", " << overall.pos.y;
+		std::cout	<< "), ширина: " << overall.width << ", высота: " << overall.height << '\n';
     std::cout << '\n';
   }
 }
@@ -312,40 +312,31 @@ int main()
   try
   {
     using namespace petrov;
-
-    // Создание фигур
     Rectangle rect({2.0, 3.0}, 4.0, 5.0);
     Diamond diamond({5.0, 5.0}, 6.0, 8.0);
     ComplexQuad quad({0.0, 0.0}, {4.0, 4.0}, {4.0, 0.0}, {0.0, 4.0});
-
     const size_t shapeCount = 3;
     Shape* shapes[shapeCount] = {&rect, &diamond, &quad};
-
     printInfo(shapes, shapeCount, "ДО МАСШТАБИРОВАНИЯ");
-
     point_t scaleCenter;
     double scaleCoeff;
-
     std::cout << "Введите центр масштабирования (x y): ";
     if (!(std::cin >> scaleCenter.x >> scaleCenter.y))
     {
       std::cerr << "Неверный ввод координат центра\n";
       return 1;
     }
-
     std::cout << "Введите коэффициент масштабирования (положительное число): ";
     if (!(std::cin >> scaleCoeff))
     {
       std::cerr << "Неверный ввод коэффициента масштабирования\n";
       return 1;
     }
-
     if (scaleCoeff <= 0.0)
     {
       std::cerr << "Коэффициент масштабирования должен быть положительным\n";
       return 1;
     }
-
     scaleAll(shapes, shapeCount, scaleCenter, scaleCoeff);
     printInfo(shapes, shapeCount, "ПОСЛЕ МАСШТАБИРОВАНИЯ");
   }
@@ -359,6 +350,5 @@ int main()
     std::cerr << "Непредвиденная ошибка: " << e.what() << std::endl;
     return 2;
   }
-
   return 0;
 }
