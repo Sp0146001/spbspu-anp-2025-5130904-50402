@@ -1,4 +1,5 @@
 #include <iostream>
+
 namespace petrov
 {
   struct point_t
@@ -24,6 +25,7 @@ namespace petrov
     virtual void move(double dx, double dy) = 0;
     virtual void scale(double k) = 0;
   };
+
   class Rectangle : public Shape
   {
   public:
@@ -50,32 +52,34 @@ namespace petrov
       throw std::invalid_argument("Ошибка: ширина и высота должны быть положительными");
     }
   }
+
   double Rectangle::getArea() const
   {
     return width_ * height_;
   }
+
   rectangle_t Rectangle::getFrameRect() const
   {
     return {width_, height_, center_};
   }
+
   void Rectangle::move(const point_t& pos)
   {
     center_ = pos;
   }
+
   void Rectangle::move(double dx, double dy)
   {
     center_.x += dx;
     center_.y += dy;
   }
+
   void Rectangle::scale(double k)
   {
-    if (k <= 0.0)
-    {
-      throw std::invalid_argument("Ошибка: коэффициент масштабирования должен быть положительным");
-    }
     width_ *= k;
     height_ *= k;
   }
+
   class Diamond : public Shape
   {
   public:
@@ -129,6 +133,7 @@ namespace petrov
     diag_h_ *= k;
     diag_v_ *= k;
   }
+
   class ComplexQuad : public Shape
   {
   public:
@@ -158,10 +163,10 @@ namespace petrov
 
   void ComplexQuad::computeCenter()
   {
-    double x1 = points_[0].x, y1 = points_[0].y;
-    double x2 = points_[2].x, y2 = points_[2].y;
-    double x3 = points_[1].x, y3 = points_[1].y;
-    double x4 = points_[3].x, y4 = points_[3].y;
+    double x1 = points_[0].x, double y1 = points_[0].y;
+    double x2 = points_[2].x, double y2 = points_[2].y;
+    double x3 = points_[1].x, double y3 = points_[1].y;
+    double x4 = points_[3].x, double y4 = points_[3].y;
 
     double denom = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
     if (std::abs(denom) < 1e-12)
@@ -198,10 +203,22 @@ namespace petrov
 
     for (int i = 1; i < 4; ++i)
     {
-      if (points_[i].x < min_x) min_x = points_[i].x;
-      if (points_[i].x > max_x) max_x = points_[i].x;
-      if (points_[i].y < min_y) min_y = points_[i].y;
-      if (points_[i].y > max_y) max_y = points_[i].y;
+      if (points_[i].x < min_x)
+      {
+        min_x = points_[i].x;
+      }
+      if (points_[i].x > max_x)
+      {
+        max_x = points_[i].x;
+      }
+      if (points_[i].y < min_y)
+      {
+        min_y = points_[i].y;
+      }
+      if (points_[i].y > max_y)
+      {
+        max_y = points_[i].y;
+      }
     }
 
     double width = max_x - min_x;
@@ -277,10 +294,22 @@ namespace petrov
       double b = frame.pos.y - frame.height / 2.0;
       double t = frame.pos.y + frame.height / 2.0;
 
-      if (l < left) left = l;
-      if (r > right) right = r;
-      if (b < bottom) bottom = b;
-      if (t > top) top = t;
+      if (l < left)
+      {
+        left = l;
+      }
+      if (r > right)
+      {
+        right = r;
+      }
+      if (b < bottom)
+      {
+        bottom = b;
+      }
+      if (t > top)
+      {
+        top = t;
+      }
     }
 
     double width = right - left;
@@ -297,46 +326,60 @@ namespace petrov
       std::cout << "Фигура " << (i + 1) << ":\n";
       std::cout << "  Площадь: " << shapes[i]->getArea() << '\n';
       rectangle_t frame = shapes[i]->getFrameRect();
-      std::cout << "  Ограничивающий прямоугольник: центр(" << frame.pos.x << ", " << frame.pos.y;
-			std::cout	<< "), ширина: " << frame.width << ", высота: " << frame.height << '\n';
+      std::cout << "  Ограничивающий прямоугольник: центр("
+                << frame.pos.x << ", " << frame.pos.y
+                << "), ширина: " << frame.width
+                << ", высота: " << frame.height << '\n';
     }
     std::cout << "Общая площадь: " << totalArea(shapes, n) << '\n';
     rectangle_t overall = overallFrame(shapes, n);
-    std::cout << "Общий ограничивающий прямоугольник: центр(" << overall.pos.x << ", " << overall.pos.y;
-		std::cout	<< "), ширина: " << overall.width << ", высота: " << overall.height << '\n';
+    std::cout << "Общий ограничивающий прямоугольник: центр("
+              << overall.pos.x << ", " << overall.pos.y
+              << "), ширина: " << overall.width
+              << ", высота: " << overall.height << '\n';
     std::cout << '\n';
   }
 }
+
 int main()
 {
   try
   {
     using namespace petrov;
+
+    // Создание фигур
     Rectangle rect({2.0, 3.0}, 4.0, 5.0);
     Diamond diamond({5.0, 5.0}, 6.0, 8.0);
     ComplexQuad quad({0.0, 0.0}, {4.0, 4.0}, {4.0, 0.0}, {0.0, 4.0});
+
     const size_t shapeCount = 3;
     Shape* shapes[shapeCount] = {&rect, &diamond, &quad};
+
     printInfo(shapes, shapeCount, "ДО МАСШТАБИРОВАНИЯ");
+
     point_t scaleCenter;
     double scaleCoeff;
+
     std::cout << "Введите центр масштабирования (x y): ";
     if (!(std::cin >> scaleCenter.x >> scaleCenter.y))
     {
       std::cerr << "Неверный ввод координат центра\n";
       return 1;
     }
+
     std::cout << "Введите коэффициент масштабирования (положительное число): ";
     if (!(std::cin >> scaleCoeff))
     {
       std::cerr << "Неверный ввод коэффициента масштабирования\n";
       return 1;
     }
+
     if (scaleCoeff <= 0.0)
     {
       std::cerr << "Коэффициент масштабирования должен быть положительным\n";
       return 1;
     }
+
     scaleAll(shapes, shapeCount, scaleCenter, scaleCoeff);
     printInfo(shapes, shapeCount, "ПОСЛЕ МАСШТАБИРОВАНИЯ");
   }
@@ -350,5 +393,6 @@ int main()
     std::cerr << "Непредвиденная ошибка: " << e.what() << std::endl;
     return 2;
   }
+
   return 0;
 }
