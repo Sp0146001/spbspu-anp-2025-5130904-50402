@@ -133,7 +133,118 @@ namespace petrov
     diag_h_ *= k;
     diag_v_ *= k;
   }
+  class ComplexQuad : public Shape
+  {
+  public:
+    ComplexQuad(const point_t& p1, const point_t& p2, const point_t& p3, const point_t& p4);
+    double getArea() const override;
+    rectangle_t getFrameRect() const override;
+    void move(const point_t& pos) override;
+    void move(double dx, double dy) override;
+    void scale(double k) override;
+
+  private:
+    point_t points_[4];
+    point_t center_;
+
+    void computeCenter();
+    static double crossProduct(const point_t& o, const point_t& a, const point_t& b);
+  };
+
+  ComplexQuad::ComplexQuad(const point_t& p1, const point_t& p2, const point_t& p3, const point_t& p4)
+  {
+    points_[0] = p1;
+    points_[1] = p2;
+    points_[2] = p3;
+    points_[3] = p4;
+    computeCenter();
+  }
+
+  void ComplexQuad::computeCenter()
+  {
+    double x1 = points_[0].x, y1 = points_[0].y;
+    double x2 = points_[2].x, y2 = points_[2].y;
+    double x3 = points_[1].x, y3 = points_[1].y;
+    double x4 = points_[3].x, y4 = points_[3].y;
+
+    double denom = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+    if (std::abs(denom) < 1e-12)
+    {
+      center_.x = (x1 + x2 + x3 + x4) / 4.0;
+      center_.y = (y1 + y2 + y3 + y4) / 4.0;
+    }
+    else
+    {
+      double t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) / denom;
+      center_.x = x1 + t * (x2 - x1);
+      center_.y = y1 + t * (y2 - y1);
+    }
+  }
+
+  double ComplexQuad::crossProduct(const point_t& o, const point_t& a, const point_t& b)
+  {
+    return (a.x - o.x) * (b.y - o.y) - (a.y - o.y) * (b.x - o.x);
+  }
+
+  double ComplexQuad::getArea() const
+  {
+    double area1 = std::abs(crossProduct(points_[0], points_[1], points_[2])) / 2.0;
+    double area2 = std::abs(crossProduct(points_[0], points_[2], points_[3])) / 2.0;
+    return area1 + area2;
+  }
+
+  rectangle_t ComplexQuad::getFrameRect() const
+  {
+    double min_x = points_[0].x;
+    double max_x = points_[0].x;
+    double min_y = points_[0].y;
+    double max_y = points_[0].y;
+
+    for (int i = 1; i < 4; ++i)
+    {
+      if (points_[i].x < min_x) min_x = points_[i].x;
+      if (points_[i].x > max_x) max_x = points_[i].x;
+      if (points_[i].y < min_y) min_y = points_[i].y;
+      if (points_[i].y > max_y) max_y = points_[i].y;
+    }
+
+    double width = max_x - min_x;
+    double height = max_y - min_y;
+    point_t pos = {min_x + width / 2.0, min_y + height / 2.0};
+    return {width, height, pos};
+  }
+
+  void ComplexQuad::move(const point_t& pos)
+  {
+    double dx = pos.x - center_.x;
+    double dy = pos.y - center_.y;
+    move(dx, dy);
+  }
+
+  void ComplexQuad::move(double dx, double dy)
+  {
+    for (int i = 0; i < 4; ++i)
+    {
+      points_[i].x += dx;
+      points_[i].y += dy;
+    }
+    center_.x += dx;
+    center_.y += dy;
+  }
+
+  void ComplexQuad::scale(double k)
+  {
+    if (k <= 0.0)
+    {
+      throw std::invalid_argument("Ошибка: коэффициент масштабирования должен быть положительным");
+    }
+    for (int i = 0; i < 4; ++i)
+    {
+      points_[i].x = center_.x + (points_[i].x - center_.x) * k;
+      points_[i].y = center_.y + (points_[i].y - center_.y) * k;
+    }
+  }
 }
 int main() {
-  return 0;
+
 }
