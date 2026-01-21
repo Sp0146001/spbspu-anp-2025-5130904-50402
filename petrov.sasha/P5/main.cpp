@@ -244,6 +244,79 @@ namespace petrov
       points_[i].y = center_.y + (points_[i].y - center_.y) * k;
     }
   }
+
+  void scaleAll(Shape** shapes, size_t n, const point_t& center, double k)
+  {
+    if (k <= 0.0)
+    {
+      throw std::invalid_argument("Ошибка: коэффициент масштабирования должен быть положительным");
+    }
+    for (size_t i = 0; i < n; ++i)
+    {
+      shapes[i]->move(-center.x, -center.y);
+      shapes[i]->scale(k);
+      shapes[i]->move(center.x, center.y);
+    }
+  }
+
+  double totalArea(Shape** shapes, size_t n)
+  {
+    double total = 0.0;
+    for (size_t i = 0; i < n; ++i)
+    {
+      total += shapes[i]->getArea();
+    }
+    return total;
+  }
+
+  rectangle_t overallFrame(Shape** shapes, size_t n)
+  {
+    if (n == 0)
+    {
+      return {0.0, 0.0, {0.0, 0.0}};
+    }
+    rectangle_t frame = shapes[0]->getFrameRect();
+    double left = frame.pos.x - frame.width / 2.0;
+    double right = frame.pos.x + frame.width / 2.0;
+    double bottom = frame.pos.y - frame.height / 2.0;
+    double top = frame.pos.y + frame.height / 2.0;
+
+    for (size_t i = 1; i < n; ++i)
+    {
+      frame = shapes[i]->getFrameRect();
+      double l = frame.pos.x - frame.width / 2.0;
+      double r = frame.pos.x + frame.width / 2.0;
+      double b = frame.pos.y - frame.height / 2.0;
+      double t = frame.pos.y + frame.height / 2.0;
+
+      if (l < left) left = l;
+      if (r > right) right = r;
+      if (b < bottom) bottom = b;
+      if (t > top) top = t;
+    }
+
+    double width = right - left;
+    double height = top - bottom;
+    point_t pos = {left + width / 2.0, bottom + height / 2.0};
+    return {width, height, pos};
+  }
+
+  void printInfo(Shape** shapes, size_t n, const char* title)
+  {
+    std::cout << title << '\n';
+    for (size_t i = 0; i < n; ++i)
+    {
+      std::cout << "Фигура " << (i + 1) << ":\n";
+      std::cout << "  Площадь: " << shapes[i]->getArea() << '\n';
+      rectangle_t frame = shapes[i]->getFrameRect();
+      std::cout << "  Ограничивающий прямоугольник: центр(" << frame.pos.x << ", " << frame.pos.y << "), ширина: " << frame.width << ", высота: " << frame.height << '\n';
+    }
+    std::cout << "Общая площадь: " << totalArea(shapes, n) << '\n';
+    rectangle_t overall = overallFrame(shapes, n);
+    std::cout << "Общий ограничивающий прямоугольник: центр(" << overall.pos.x << ", " << overall.pos.y << "), ширина: " << overall.width << ", высота: " << overall.height << '\n';
+    std::cout << '\n';
+  }
+
 }
 int main() {
 
