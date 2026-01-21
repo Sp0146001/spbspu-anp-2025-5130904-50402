@@ -346,8 +346,6 @@ int main()
   try
   {
     using namespace petrov;
-
-    // Создание фигур
     Rectangle rect({2.0, 3.0}, 4.0, 5.0);
     Diamond diamond({5.0, 5.0}, 6.0, 8.0);
     ComplexQuad quad({0.0, 0.0}, {4.0, 4.0}, {4.0, 0.0}, {0.0, 4.0});
@@ -390,7 +388,7 @@ int main()
   }
   catch (const std::exception& e)
   {
-    std::cerr << "Непредвиденная ошибка: " << e.what() << std::endl;
+    std::cerr << "Непредвиденная ошибка: " << e.what() << '\n';
     return 2;
   }
 
