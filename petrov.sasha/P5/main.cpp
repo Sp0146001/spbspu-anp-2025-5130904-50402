@@ -14,7 +14,7 @@ namespace petrov
     double height;
     point_t pos;
   };
-  
+
   void printRectangle(const rectangle_t& rect) noexcept;
 
   class Shape
@@ -45,7 +45,7 @@ private:
     point_t center_;
     double width_;
     double height_;
-    
+
     void doScale(double k) noexcept override;
   };
 
@@ -77,7 +77,7 @@ private:
   private:
     point_t points_[4];
     point_t center_;
-    
+
     void doScale(double k) noexcept override;
     point_t getCenter() const noexcept;
     void computeCenter() noexcept;
@@ -98,7 +98,7 @@ private:
 
 int main()
 {
-  try 
+  try
   {
     using namespace petrov;
 
@@ -152,7 +152,7 @@ void petrov::Shape::scale(double k)
     }
     doScale(k);
   }
-    
+
 void petrov::Shape::noScale(double k) noexcept
 {
   doScale(k);
@@ -394,7 +394,6 @@ void petrov::printInfo(Shape** shapes, size_t n, const char* title) noexcept
     printRectangle(frame);
     std::cout << '\n';
   }
-  
   std::cout << "Общая площадь: " << totalArea(shapes, n) << '\n';
   rectangle_t overall = overallFrame(shapes, n);
   std::cout << "Общий ограничивающий прямоугольник: ";
