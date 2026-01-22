@@ -89,12 +89,6 @@ private:
   rectangle_t overallFrame(Shape** shapes, size_t n) noexcept;
   void printInfo(Shape** shapes, size_t n, const char* title) noexcept;
 }
-//    _  _
-//  /  \/  \
-//  \      /
-//   \    /
-//    \  /
-//     \/
 
 int main()
 {
