@@ -26,7 +26,7 @@ namespace petrov
     virtual void move(const point_t& pos) noexcept = 0;
     virtual void move(double dx, double dy) noexcept = 0;
     virtual void scale(double k);
-    virtual void noScale(double k) noexcept;
+    void publicScale(double k) noexcept;
 
 private:
     virtual void doScale(double k) noexcept = 0;
@@ -147,7 +147,7 @@ void petrov::Shape::scale(double k)
     doScale(k);
   }
 
-void petrov::Shape::noScale(double k) noexcept
+void petrov::Shape::publicScale(double k) noexcept
 {
   doScale(k);
 }
@@ -329,7 +329,7 @@ void petrov::scaleAll(Shape** shapes, size_t n, const point_t& center, double k)
   for (size_t i = 0; i < n; ++i)
   {
     shapes[i]->move(-center.x, -center.y);
-    shapes[i]->noScale(k);
+    shapes[i]->publicScale(k);
     shapes[i]->move(center.x, center.y);
   }
 }
