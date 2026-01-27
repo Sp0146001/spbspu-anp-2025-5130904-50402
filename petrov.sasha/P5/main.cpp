@@ -28,7 +28,7 @@ namespace petrov
     virtual void scale(double k);
     void untestedScale(double k) noexcept;
 
-private:
+  private:
     virtual void doScale(double k) noexcept = 0;
   };
 
@@ -80,14 +80,14 @@ private:
 
     void doScale(double k) noexcept override;
     point_t getCenter() const noexcept;
-    void computeCenter() noexcept;
+    static point_t computeCenter(const point_t (&points)[4]) noexcept;
     double crossProduct(const point_t& o, const point_t& a, const point_t& b) const noexcept;
   };
 
   void scaleAll(Shape** shapes, size_t n, const point_t& center, double k);
-  double totalArea(Shape** shapes, size_t n) noexcept;
-  rectangle_t overallFrame(Shape** shapes, size_t n) noexcept;
-  void printInfo(Shape** shapes, size_t n, const char* title) noexcept;
+  double totalArea(const Shape* const* shapes, size_t n) noexcept;
+  rectangle_t overallFrame(const Shape* const* shapes, size_t n) noexcept;
+  void printInfo(const Shape* const* shapes, size_t n, const char* title) noexcept;
 }
 
 int main()
@@ -101,7 +101,7 @@ int main()
     ComplexQuad quad({0.0, 0.0}, {4.0, 4.0}, {4.0, 0.0}, {0.0, 4.0});
 
     const size_t n = 3;
-    Shape* shapes[n] = {std::addressof(rect), std::addressof(diamond), std::addressof(quad)};
+    const Shape* shapes[n] = {std::addressof(rect), std::addressof(diamond), std::addressof(quad)};
 
     printInfo(shapes, n, "ДО МАСШТАБИРОВАНИЯ");
 
@@ -121,17 +121,10 @@ int main()
       std::cerr << "Неверный ввод коэффициента масштабирования\n";
       return 1;
     }
-
-    scaleAll(shapes, n, scaleCenter, scaleCoeff);
+    Shape* mutabShapes[n] = {&rect, &diamond, &quad};
+    scaleAll(mutabShapes, n, scaleCenter, scaleCoeff);
     printInfo(shapes, n, "ПОСЛЕ МАСШТАБИРОВАНИЯ");
-  }
-  catch (const std::invalid_argument& e)
-  {
-    std::cerr << e.what() << std::endl;
-    return 2;
-  }
-  catch (const std::logic_error& e)
-  {
+  } catch (const std::invalid_argument& e) {
     std::cerr << e.what() << '\n';
     return 2;
   }
@@ -229,32 +222,35 @@ void petrov::Diamond::doScale(double k) noexcept
   diag_v_ *= k;
 }
 
-
-petrov::ComplexQuad::ComplexQuad(const point_t& p1, const point_t& p2, const point_t& p3, const point_t& p4):
-  points_{p1, p2, p3, p4}
+petrov::point_t petrov::ComplexQuad::computeCenter(const point_t (&points)[4]) noexcept
 {
-  computeCenter();
-}
-
-void petrov::ComplexQuad::computeCenter() noexcept
-{
-  double x1 = points_[0].x, y1 = points_[0].y;
-  double x2 = points_[2].x, y2 = points_[2].y;
-  double x3 = points_[1].x, y3 = points_[1].y;
-  double x4 = points_[3].x, y4 = points_[3].y;
+  double x1 = points[0].x, y1 = points[0].y;
+  double x2 = points[2].x, y2 = points[2].y;
+  double x3 = points[1].x, y3 = points[1].y;
+  double x4 = points[3].x, y4 = points[3].y;
 
   double denom = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
   if (std::abs(denom) < 1e-12)
   {
-    center_.x = (x1 + x2 + x3 + x4) / 4.0;
-    center_.y = (y1 + y2 + y3 + y4) / 4.0;
+    return {
+      (x1 + x2 + x3 + x4) / 4.0,
+      (y1 + y2 + y3 + y4) / 4.0
+    };
   }
   else
   {
     double t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) / denom;
-    center_.x = x1 + t * (x2 - x1);
-    center_.y = y1 + t * (y2 - y1);
+    return {
+      x1 + t * (x2 - x1),
+      y1 + t * (y2 - y1)
+    };
   }
+}
+
+petrov::ComplexQuad::ComplexQuad(const point_t& p1, const point_t& p2, const point_t& p3, const point_t& p4):
+  points_{p1, p2, p3, p4},
+  center_(computeCenter(points_))
+{
 }
 
 double petrov::ComplexQuad::crossProduct(const point_t& o, const point_t& a, const point_t& b) const noexcept
@@ -296,10 +292,12 @@ void petrov::ComplexQuad::move(const point_t& pos) noexcept
   double dy = pos.y - center_.y;
   move(dx, dy);
 }
+
 petrov::point_t petrov::ComplexQuad::getCenter() const noexcept
 {
   return center_;
 }
+
 void petrov::ComplexQuad::move(double dx, double dy) noexcept
 {
   for (int i = 0; i < 4; ++i)
@@ -334,7 +332,7 @@ void petrov::scaleAll(Shape** shapes, size_t n, const point_t& center, double k)
   }
 }
 
-double petrov::totalArea(Shape** shapes, size_t n) noexcept
+double petrov::totalArea(const Shape* const* shapes, size_t n) noexcept  // Исправлено
 {
   double total = 0.0;
   for (size_t i = 0; i < n; ++i)
@@ -344,7 +342,7 @@ double petrov::totalArea(Shape** shapes, size_t n) noexcept
   return total;
 }
 
-petrov::rectangle_t petrov::overallFrame(Shape** shapes, size_t n) noexcept
+petrov::rectangle_t petrov::overallFrame(const Shape* const* shapes, size_t n) noexcept
 {
   if (n == 0)
   {
@@ -376,7 +374,7 @@ petrov::rectangle_t petrov::overallFrame(Shape** shapes, size_t n) noexcept
   return {width, height, pos};
 }
 
-void petrov::printInfo(Shape** shapes, size_t n, const char* title) noexcept
+void petrov::printInfo(const Shape* const* shapes, size_t n, const char* title) noexcept
 {
   std::cout << title << '\n';
   for (size_t i = 0; i < n; ++i)
@@ -394,9 +392,9 @@ void petrov::printInfo(Shape** shapes, size_t n, const char* title) noexcept
   printRectangle(overall);
   std::cout << '\n';
 }
+
 void petrov::printRectangle(const rectangle_t& rect) noexcept
 {
   std::cout << "центр(" << rect.pos.x << ", " << rect.pos.y;
   std::cout << "), ширина: " << rect.width << ", высота: " << rect.height;
 }
-
