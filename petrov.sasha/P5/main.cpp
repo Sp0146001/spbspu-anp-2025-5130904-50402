@@ -124,21 +124,28 @@ int main()
     Shape* mutabShapes[n] = {&rect, &diamond, &quad};
     scaleAll(mutabShapes, n, scaleCenter, scaleCoeff);
     printInfo(shapes, n, "ПОСЛЕ МАСШТАБИРОВАНИЯ");
-  } catch (const std::invalid_argument& e) {
+  }
+  catch (const std::invalid_argument& e)
+  {
     std::cerr << e.what() << '\n';
+    return 2;
+  }
+  catch (const std::logic_error& e)
+  {
+    std::cerr << "Логическая ошибка в фигуре: " << e.what() << '\n';
     return 2;
   }
   return 0;
 }
 
 void petrov::Shape::scale(double k)
+{
+  if (k <= 0.0)
   {
-    if (k <= 0.0)
-    {
-      throw std::invalid_argument("Коэффициент масштабирования должен быть положительным");
-    }
-    doScale(k);
+    throw std::invalid_argument("Коэффициент масштабирования должен быть положительным");
   }
+  doScale(k);
+}
 
 void petrov::Shape::untestedScale(double k) noexcept
 {
@@ -153,6 +160,10 @@ petrov::Rectangle::Rectangle(const point_t& center, double width, double height)
   if (width_ <= 0.0 || height_ <= 0.0)
   {
     throw std::invalid_argument("Ширина и высота должны быть положительными");
+  }
+  if (width_ > 10000.0 || height_ > 10000.0)
+  {
+    throw std::logic_error("Размеры прямоугольника слишком велики");
   }
 }
 
@@ -183,7 +194,6 @@ void petrov::Rectangle::doScale(double k) noexcept
   height_ *= k;
 }
 
-
 petrov::Diamond::Diamond(const point_t& center, double diag_h, double diag_v):
   center_(center),
   diag_h_(diag_h),
@@ -192,6 +202,10 @@ petrov::Diamond::Diamond(const point_t& center, double diag_h, double diag_v):
   if (diag_h_ <= 0.0 || diag_v_ <= 0.0)
   {
     throw std::invalid_argument("Диагонали должны быть положительными");
+  }
+  if (diag_h_ > 10000.0 || diag_v_ > 10000.0)
+  {
+    throw std::logic_error("Диагонали ромба слишком велики");
   }
 }
 
@@ -251,6 +265,11 @@ petrov::ComplexQuad::ComplexQuad(const point_t& p1, const point_t& p2, const poi
   points_{p1, p2, p3, p4},
   center_(computeCenter(points_))
 {
+  double area = getArea();
+  if (area < 1e-12)
+  {
+    throw std::logic_error("Четырехугольник вырожденный или имеет нулевую площадь");
+  }
 }
 
 double petrov::ComplexQuad::crossProduct(const point_t& o, const point_t& a, const point_t& b) const noexcept
@@ -332,7 +351,7 @@ void petrov::scaleAll(Shape** shapes, size_t n, const point_t& center, double k)
   }
 }
 
-double petrov::totalArea(const Shape* const* shapes, size_t n) noexcept  // Исправлено
+double petrov::totalArea(const Shape* const* shapes, size_t n) noexcept
 {
   double total = 0.0;
   for (size_t i = 0; i < n; ++i)
