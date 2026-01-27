@@ -125,14 +125,9 @@ int main()
     scaleAll(mutabShapes, n, scaleCenter, scaleCoeff);
     printInfo(shapes, n, "ПОСЛЕ МАСШТАБИРОВАНИЯ");
   }
-  catch (const std::invalid_argument& e)
+  catch (const std::exception& e)
   {
     std::cerr << e.what() << '\n';
-    return 2;
-  }
-  catch (const std::logic_error& e)
-  {
-    std::cerr << "Логическая ошибка в фигуре: " << e.what() << '\n';
     return 2;
   }
   return 0;
